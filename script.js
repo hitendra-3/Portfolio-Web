@@ -5,9 +5,9 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initAnimations();
-    // initSmoothScroll(); // Removed: handled by CSS
+    initSmoothScroll();
     initNavbar();
-    // initParallax(); // Removed: using CSS animations
+    initParallax();
     initSkillCards();
     initScrollIndicator();
 });
@@ -19,14 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
 function initAnimations() {
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '0px 0px -100px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.style.opacity = '1';
-                entry.style.transform = 'translateY(0)';
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
                 observer.unobserve(entry.target);
             }
         });
@@ -43,24 +43,69 @@ function initAnimations() {
 }
 
 // ============================================
-// NAVBAR INTERACTIONS (Optimized)
+// SMOOTH SCROLLING
+// ============================================
+
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const headerOffset = 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+}
+
+// ============================================
+// NAVBAR INTERACTIONS
 // ============================================
 
 function initNavbar() {
     const header = document.querySelector('.header');
     const navLinks = document.querySelectorAll('.nav-link');
+    let lastScroll = 0;
+
+    // Header scroll effect
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+
+        if (currentScroll > 100) {
+            header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+        } else {
+            header.style.boxShadow = 'none';
+        }
+
+        lastScroll = currentScroll;
+    });
+
+    // Active nav link on scroll
     const sections = document.querySelectorAll('section[id]');
 
-    let ticking = false;
-
     window.addEventListener('scroll', () => {
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                updateNavbar(header, navLinks, sections);
-                ticking = false;
-            });
-            ticking = true;
-        }
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (window.pageYOffset >= sectionTop - 150) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+            }
+        });
     });
 
     // Logo hover animation
@@ -75,39 +120,14 @@ function initNavbar() {
     }
 }
 
-function updateNavbar(header, navLinks, sections) {
-    const currentScroll = window.pageYOffset;
+// ============================================
+// PARALLAX EFFECTS (Optimized to prevent scroll sticking)
+// ============================================
 
-    // Header shadow
-    if (currentScroll > 50) {
-        header.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.05)';
-        header.style.background = 'rgba(245, 245, 245, 0.98)';
-    } else {
-        header.style.boxShadow = 'none';
-        header.style.background = 'rgba(245, 245, 245, 0.95)';
-    }
-
-    // Active link
-    let current = '';
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        constsectionHeight = section.clientHeight;
-        if (window.pageYOffset >= sectionTop - 200) {
-            current = section.getAttribute('id');
-        }
-    });
-
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-            link.classList.add('active');
-        }
-    });
+function initParallax() {
+    // Removed parallax to prevent scroll sticking
+    // Star rotation is handled by CSS animation only
 }
-
-// ============================================
-// SKILL CARDS INTERACTIONS
-// ============================================
 
 // ============================================
 // SKILL CARDS INTERACTIONS
