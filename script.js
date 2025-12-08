@@ -5,65 +5,21 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initAnimations();
-    initSmoothScroll();
+    // initSmoothScroll(); // Disabled to prevent conflict with native CSS smooth scroll
     initNavbar();
     initParallax();
     initSkillCards();
     initScrollIndicator();
+    initScrollToTop();
 });
 
-// ============================================
-// SCROLL ANIMATIONS
-// ============================================
-
-function initAnimations() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    // Observe all fade-in elements
-    const fadeElements = document.querySelectorAll('.fade-in, .skill-card, .about-text, .about-image');
-    fadeElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        observer.observe(el);
-    });
-}
+// ...
 
 // ============================================
-// SMOOTH SCROLLING
+// SMOOTH SCROLLING (Disabled)
 // ============================================
 
-function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                const headerOffset = 80;
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-}
+// function initSmoothScroll() { ... }
 
 // ============================================
 // NAVBAR INTERACTIONS
@@ -322,3 +278,35 @@ window.addEventListener('scroll', throttledScroll);
 
 console.log('%c👋 Welcome to Hitendra S Portfolio!', 'font-size: 20px; font-weight: bold; color: #6C5CE7;');
 console.log('%cBuilt with creativity and modern web technologies', 'font-size: 12px; color: #666;');
+
+// ============================================
+// SCROLL TO TOP
+// ============================================
+
+function initScrollToTop() {
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+    if (scrollToTopBtn) {
+        // Show/Hide button on scroll
+        // Show/Hide button on scroll
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (scrollTop > 300) {
+                // scrollToTopBtn.style.display = 'block'; // Conflict with CSS grid
+                scrollToTopBtn.classList.add('show');
+            } else {
+                // scrollToTopBtn.style.display = 'none';
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+
+        // Scroll to top on click
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+}
