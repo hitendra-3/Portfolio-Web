@@ -5,9 +5,9 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     initAnimations();
-    initSmoothScroll();
+    // initSmoothScroll(); // Removed: handled by CSS
     initNavbar();
-    initParallax();
+    // initParallax(); // Removed: using CSS animations
     initSkillCards();
     initScrollIndicator();
 });
@@ -19,14 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
 function initAnimations() {
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
+        rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.style.opacity = '1';
+                entry.style.transform = 'translateY(0)';
                 observer.unobserve(entry.target);
             }
         });
@@ -43,69 +43,24 @@ function initAnimations() {
 }
 
 // ============================================
-// SMOOTH SCROLLING
-// ============================================
-
-function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                const headerOffset = 80;
-                const elementPosition = target.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-}
-
-// ============================================
-// NAVBAR INTERACTIONS
+// NAVBAR INTERACTIONS (Optimized)
 // ============================================
 
 function initNavbar() {
     const header = document.querySelector('.header');
     const navLinks = document.querySelectorAll('.nav-link');
-    let lastScroll = 0;
-
-    // Header scroll effect
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-
-        if (currentScroll > 100) {
-            header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-        } else {
-            header.style.boxShadow = 'none';
-        }
-
-        lastScroll = currentScroll;
-    });
-
-    // Active nav link on scroll
     const sections = document.querySelectorAll('section[id]');
-    
-    window.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (window.pageYOffset >= sectionTop - 150) {
-                current = section.getAttribute('id');
-            }
-        });
 
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${current}`) {
-                link.classList.add('active');
-            }
-        });
+    let ticking = false;
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                updateNavbar(header, navLinks, sections);
+                ticking = false;
+            });
+            ticking = true;
+        }
     });
 
     // Logo hover animation
@@ -120,14 +75,39 @@ function initNavbar() {
     }
 }
 
-// ============================================
-// PARALLAX EFFECTS (Optimized to prevent scroll sticking)
-// ============================================
+function updateNavbar(header, navLinks, sections) {
+    const currentScroll = window.pageYOffset;
 
-function initParallax() {
-    // Removed parallax to prevent scroll sticking
-    // Star rotation is handled by CSS animation only
+    // Header shadow
+    if (currentScroll > 50) {
+        header.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.05)';
+        header.style.background = 'rgba(245, 245, 245, 0.98)';
+    } else {
+        header.style.boxShadow = 'none';
+        header.style.background = 'rgba(245, 245, 245, 0.95)';
+    }
+
+    // Active link
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        constsectionHeight = section.clientHeight;
+        if (window.pageYOffset >= sectionTop - 200) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+        }
+    });
 }
+
+// ============================================
+// SKILL CARDS INTERACTIONS
+// ============================================
 
 // ============================================
 // SKILL CARDS INTERACTIONS
@@ -135,18 +115,18 @@ function initParallax() {
 
 function initSkillCards() {
     const skillCards = document.querySelectorAll('.skill-card');
-    
+
     skillCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
+        card.addEventListener('mouseenter', function () {
             this.style.transform = 'translateY(-10px) rotate(2deg) scale(1.05)';
         });
-        
-        card.addEventListener('mouseleave', function() {
+
+        card.addEventListener('mouseleave', function () {
             this.style.transform = 'translateY(0) rotate(0deg) scale(1)';
         });
-        
+
         // Add click animation
-        card.addEventListener('click', function() {
+        card.addEventListener('click', function () {
             this.style.transform = 'translateY(-5px) rotate(-2deg) scale(0.98)';
             setTimeout(() => {
                 this.style.transform = 'translateY(-10px) rotate(2deg) scale(1.05)';
@@ -161,11 +141,11 @@ function initSkillCards() {
 
 function initScrollIndicator() {
     const scrollIndicator = document.querySelector('.scroll-indicator');
-    
+
     if (scrollIndicator) {
         window.addEventListener('scroll', () => {
             const scrollPercentage = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-            
+
             if (scrollPercentage > 80) {
                 scrollIndicator.style.opacity = '0';
             } else {
@@ -181,7 +161,7 @@ function initScrollIndicator() {
 
 function animateBannerX() {
     const bannerXes = document.querySelectorAll('.banner-x');
-    
+
     bannerXes.forEach((x, index) => {
         setInterval(() => {
             x.style.transform = `rotate(${45 + Math.random() * 180}deg)`;
@@ -198,13 +178,13 @@ animateBannerX();
 
 function initStarInteraction() {
     const star = document.querySelector('.sunburst-star');
-    
+
     if (star) {
-        star.addEventListener('mouseenter', function() {
+        star.addEventListener('mouseenter', function () {
             this.style.animationPlayState = 'paused';
         });
-        
-        star.addEventListener('mouseleave', function() {
+
+        star.addEventListener('mouseleave', function () {
             this.style.animationPlayState = 'running';
         });
     }
@@ -219,7 +199,7 @@ initStarInteraction();
 function typeWriter(element, text, speed = 100) {
     let i = 0;
     element.textContent = '';
-    
+
     function type() {
         if (i < text.length) {
             element.textContent += text.charAt(i);
@@ -227,7 +207,7 @@ function typeWriter(element, text, speed = 100) {
             setTimeout(type, speed);
         }
     }
-    
+
     type();
 }
 
@@ -250,13 +230,13 @@ function initCursorTrail() {
         display: none;
     `;
     document.body.appendChild(cursor);
-    
+
     document.addEventListener('mousemove', (e) => {
         cursor.style.display = 'block';
         cursor.style.left = e.clientX - 10 + 'px';
         cursor.style.top = e.clientY - 10 + 'px';
     });
-    
+
     // Hide on mobile
     if (window.innerWidth <= 768) {
         cursor.style.display = 'none';
@@ -272,14 +252,14 @@ function initCursorTrail() {
 
 function initPageTransitions() {
     const links = document.querySelectorAll('a[href^="#"]');
-    
+
     links.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
                 target.style.opacity = '0';
                 target.style.transform = 'translateY(20px)';
-                
+
                 setTimeout(() => {
                     target.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
                     target.style.opacity = '1';
