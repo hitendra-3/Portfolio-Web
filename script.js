@@ -28,13 +28,32 @@ document.addEventListener('DOMContentLoaded', () => {
 function initNavbar() {
     const header = document.querySelector('.header');
     const navLinks = document.querySelectorAll('.nav-link');
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-links');
+
+    // Mobile Menu Toggle
+    if (hamburger) {
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+    }
+
+    // Close mobile menu when link is clicked
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    });
+
     let lastScroll = 0;
 
     // Header scroll effect
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
 
-        if (currentScroll > 100) {
+        if (currentScroll > 50) {
             header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
         } else {
             header.style.boxShadow = 'none';
@@ -46,25 +65,39 @@ function initNavbar() {
     // Active nav link on scroll
     const sections = document.querySelectorAll('section[id]');
 
-    window.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (window.pageYOffset >= sectionTop - 150) {
-                current = section.getAttribute('id');
-            }
-        });
+    // Active nav link using IntersectionObserver
+    const sections = document.querySelectorAll('section[id]');
 
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${current}`) {
-                link.classList.add('active');
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.3 // Trigger when 30% of section is visible
+    };
+
+    const navObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+
+                // Remove active from all
+                navLinks.forEach(link => link.classList.remove('active'));
+
+                // Add active to matching link
+                // Handle mapping intermediate sections to main links if needed
+                // For now, strict mapping
+                const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
             }
         });
+    }, observerOptions);
+
+    sections.forEach(section => {
+        navObserver.observe(section);
     });
 
-    // Logo hover animation
+    // Logo hover animation is handled via separate listeners but kept simple here
     const logo = document.querySelector('.logo-link');
     if (logo) {
         logo.addEventListener('mouseenter', () => {

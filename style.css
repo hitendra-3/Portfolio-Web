@@ -134,7 +134,8 @@ ul {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-sm) var(--spacing-md);
+    height: 80px;
+    position: relative;
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -145,37 +146,31 @@ ul {
     font-weight: 700;
     color: var(--black);
     letter-spacing: 2px;
-    position: relative;
-    display: inline-block;
-    transition: transform var(--transition-bounce);
-}
-
-.logo-link:hover {
-    transform: scale(1.1) rotate(-5deg);
 }
 
 .nav-links {
     display: flex;
     gap: var(--spacing-md);
-    align-items: center;
 }
 
 .nav-link {
     font-family: var(--font-bold);
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--purple);
-    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-light);
     letter-spacing: 1px;
     position: relative;
-    padding: var(--spacing-xs) 0;
-    transition: color var(--transition-normal);
+}
+
+.nav-link.active,
+.nav-link:hover {
+    color: var(--purple);
 }
 
 .nav-link::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    bottom: -5px;
     left: 0;
     width: 0;
     height: 2px;
@@ -183,9 +178,65 @@ ul {
     transition: width var(--transition-normal);
 }
 
-.nav-link:hover::after,
-.nav-link.active::after {
+.nav-link.active::after,
+.nav-link:hover::after {
     width: 100%;
+}
+
+/* Hamburger Menu */
+.hamburger {
+    display: none;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.bar {
+    width: 25px;
+    height: 3px;
+    background-color: var(--black);
+    margin: 5px 0;
+    transition: 0.4s;
+}
+
+/* Mobile Nav */
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
+    }
+
+    .nav-links {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        gap: 0;
+        flex-direction: column;
+        background-color: var(--white);
+        width: 100%;
+        height: 100vh;
+        text-align: center;
+        transition: 0.3s;
+        padding-top: 100px;
+    }
+
+    .nav-links.active {
+        left: 0;
+    }
+
+    .nav-links li {
+        margin: 20px 0;
+    }
+
+    .hamburger.active .bar:nth-child(1) {
+        transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .hamburger.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger.active .bar:nth-child(3) {
+        transform: rotate(45deg) translate(-5px, -6px);
+    }
 }
 
 .nav-link:hover,
